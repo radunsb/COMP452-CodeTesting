@@ -24,27 +24,14 @@ public class StatsFile extends GameStats {
     public StatsFile(){
         statsMap = new TreeMap<>();
         LocalDateTime limit = LocalDateTime.now().minusDays(30);
+        readCSV(FILENAME, limit);
+    }
 
+    public void readCSV(String fileName, LocalDateTime limit){
         try (CSVReader csvReader = new CSVReader(new FileReader(FILENAME))) {
             String[] values = null;
             while ((values = csvReader.readNext()) != null) {
-                // values should have the date and the number of guesses as the two fields
-                try {
-                    LocalDateTime timestamp = LocalDateTime.parse(values[0]);
-                    int numGuesses = Integer.parseInt(values[1]);
-
-                    if (timestamp.isAfter(limit)) {
-                        statsMap.put(numGuesses, 1 + statsMap.getOrDefault(numGuesses, 0));
-                    }
-                }
-                catch(NumberFormatException nfe){
-                    // NOTE: In a full implementation, we would log this error and possibly alert the user
-                    throw nfe;
-                }
-                catch(DateTimeParseException dtpe){
-                    // NOTE: In a full implementation, we would log this error and possibly alert the user
-                    throw dtpe;
-                }
+                readLine(values, limit);
             }
         } catch (CsvValidationException e) {
             // NOTE: In a full implementation, we would log this error and alert the user
@@ -52,6 +39,25 @@ public class StatsFile extends GameStats {
         } catch (IOException e) {
             // NOTE: In a full implementation, we would log this error and alert the user
             // NOTE: For this project, you do not need unit tests for handling this exception.
+        }
+    }
+
+    public void readLine(String[] csvLine, LocalDateTime limit){
+        // values should have the date and the number of guesses as the two fields
+        try {
+            LocalDateTime timestamp = LocalDateTime.parse(csvLine[0]);
+            int numGuesses = Integer.parseInt(csvLine[1]);
+            if (timestamp.isAfter(limit)) {
+                statsMap.put(numGuesses, 1 + statsMap.getOrDefault(numGuesses, 0));
+            }
+        }
+        catch(NumberFormatException nfe){
+            // NOTE: In a full implementation, we would log this error and possibly alert the user
+            throw nfe;
+        }
+        catch(DateTimeParseException dtpe){
+            // NOTE: In a full implementation, we would log this error and possibly alert the user
+            throw dtpe;
         }
     }
 
