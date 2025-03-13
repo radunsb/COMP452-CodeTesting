@@ -77,4 +77,12 @@ public class StatsFile extends GameStats {
         return (statsMap.isEmpty() ? 0 : statsMap.lastKey());
     }
 
+    public int numGamesInBounds(int lowBound, int highBound){
+        int numGames = 0;
+        for(int i = lowBound; i <= highBound; i++){
+            numGames += numGames(i);
+        }
+        return numGames;
+    }
+
 }
