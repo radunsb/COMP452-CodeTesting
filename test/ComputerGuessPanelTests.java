@@ -13,43 +13,52 @@ public class ComputerGuessPanelTests {
     Consumer<GameResult> gameFinishedCallback;
 
     @Test
-    public void getGuessMessage(){
+    public void getDefaultMessage(){
         ComputerGuessesPanel CGP = new ComputerGuessesPanel(cardsPanel, gameFinishedCallback);
-        assertEquals("I guess 501", CGP.getGuessMessage());
+        assertEquals("I guess ___.", CGP.getGuessMessage());
     }
 
-    // Will fail as the program is unable to test for these test cases
+    @Test
+    public void getFirstGuessMessage(){
+        ComputerGuessesPanel CGP = new ComputerGuessesPanel(cardsPanel, gameFinishedCallback);
+        CGP.makeGuess();
+        assertEquals("I guess 501.", CGP.getGuessMessage());
+    }
+
+    // Brayden said this should fail but I don't see how it would
+    // There might have been a bug we accidentally removed
     @Test
     public void TestComputerHighEndGuess(){
         ComputerGuessesPanel CGP = new ComputerGuessesPanel(cardsPanel, gameFinishedCallback);
         for (int i = 0; i<9; i++) {
-            CGP.greaterSim();
+            CGP.respondToWrongGuess(true);
         }
-        assertEquals("I guess 999.", CGP.getGuessMessage());
-        CGP.greaterSim();
-        assertEquals("I guess 1300", CGP.getGuessMessage());
+        assertEquals("I guess 1000.", CGP.getGuessMessage());
     }
 
-    // Will fail as the program is unable to test for these test cases
     @Test
     public void TestComputerLowEndGuess(){
         ComputerGuessesPanel CGP = new ComputerGuessesPanel(cardsPanel, gameFinishedCallback);
         for (int i = 0; i<9; i++) {
-            CGP.lesserSim();
+            CGP.respondToWrongGuess(false);
         }
-        assertEquals("I guess 2.", CGP.getGuessMessage());
-        CGP.lesserSim();
-        assertEquals("I guess -50", CGP.getGuessMessage());
+        assertEquals("I guess 1.", CGP.getGuessMessage());
     }
 
     // Will fail as the program is unable to test for these test cases
     @Test
     public void TestComputer250Guess(){
         ComputerGuessesPanel CGP = new ComputerGuessesPanel(cardsPanel, gameFinishedCallback);
-        CGP.lesserSim();
-        CGP.lesserSim();
-        for (int i = 0; i<6; i++) {
-            CGP.greaterSim();
+        int myNum = 250;
+        int guess = 501;
+        for (int i = 0; i<50; i++) {
+            if(guess > myNum){
+                guess = CGP.respondToWrongGuess(false, guess);
+            }
+            else if(guess < myNum){
+                guess = CGP.respondToWrongGuess(true, guess);
+            }
+            else break;
         }
         assertEquals("I guess 250.", CGP.getGuessMessage());
     }
@@ -58,9 +67,16 @@ public class ComputerGuessPanelTests {
     @Test
     public void TestComputer500Guess(){
         ComputerGuessesPanel CGP = new ComputerGuessesPanel(cardsPanel, gameFinishedCallback);
-        CGP.lesserSim();
-        for (int i = 0; i<7; i++) {
-            CGP.greaterSim();
+        int myNum = 500;
+        int guess = 501;
+        for (int i = 0; i<50; i++) {
+            if(guess > myNum){
+                guess = CGP.respondToWrongGuess(false, guess);
+            }
+            else if(guess < myNum){
+                guess = CGP.respondToWrongGuess(true, guess);
+            }
+            else break;
         }
         assertEquals("I guess 500.", CGP.getGuessMessage());
     }
@@ -69,10 +85,16 @@ public class ComputerGuessPanelTests {
     @Test
     public void TestComputer750Guess(){
         ComputerGuessesPanel CGP = new ComputerGuessesPanel(cardsPanel, gameFinishedCallback);
-        CGP.greaterSim();
-        CGP.lesserSim();
-        for (int i = 0; i<7; i++) {
-            CGP.greaterSim();
+        int myNum = 750;
+        int guess = 501;
+        for (int i = 0; i<50; i++) {
+            if(guess > myNum){
+                guess = CGP.respondToWrongGuess(false, guess);
+            }
+            else if(guess < myNum){
+                guess = CGP.respondToWrongGuess(true, guess);
+            }
+            else break;
         }
         assertEquals("I guess 750.", CGP.getGuessMessage());
     }
@@ -80,50 +102,26 @@ public class ComputerGuessPanelTests {
     @Test
     public void TestComputerCorrectGuess(){
         ComputerGuessesPanel CGP = new ComputerGuessesPanel(cardsPanel, gameFinishedCallback);
+        CGP.makeGuess();
         assertEquals("I guess 501.", CGP.getGuessMessage());
     }
 
+    //These 2 shows that the numGuesses will be 1 less than it should be
+    //Not sure if this was a bug to begin with or if our refactoring caused it
     @Test
-    public void TestComputerLowerGuess(){
+    public void getsCorrectNumGuesses(){
         ComputerGuessesPanel CGP = new ComputerGuessesPanel(cardsPanel, gameFinishedCallback);
-        CGP.lesserSim();
+        CGP.makeGuess();
+        assertEquals("I guess 501.", CGP.getGuessMessage());
+        assertEquals(1, CGP.getNumGuesses());
+    }
+
+    @Test
+    public void getsCorrectNumGuesses2(){
+        ComputerGuessesPanel CGP = new ComputerGuessesPanel(cardsPanel, gameFinishedCallback);
+        CGP.makeGuess();
+        CGP.respondToWrongGuess(false,  501);
         assertEquals("I guess 251.", CGP.getGuessMessage());
-    }
-
-    @Test
-    public void TestComputerHigherGuess(){
-        ComputerGuessesPanel CGP = new ComputerGuessesPanel(cardsPanel, gameFinishedCallback);
-        CGP.greaterSim();
-        assertEquals("I guess 751.", CGP.getGuessMessage());
-    }
-
-    @Test
-    public void TestComputerScoreUpdates(){
-        ComputerGuessesPanel CGP = new ComputerGuessesPanel(cardsPanel, gameFinishedCallback);
-        String csvFile = "guess-the-number-stats.csv";
-        int rowCount = 0;
-        String line;
-        try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
-            while ((line = br.readLine()) != null) {
-                rowCount++;
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        CGP.equalSim(cardsPanel, gameFinishedCallback);
-
-        int NewRowCount = 0;
-        String NewLine;
-        try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
-            while ((NewLine = br.readLine()) != null) {
-                rowCount++;
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        assertEquals(rowCount, NewRowCount);
-
+        assertEquals(2, CGP.getNumGuesses());
     }
 }

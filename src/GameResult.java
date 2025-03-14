@@ -12,4 +12,5 @@ public class GameResult {
         this.correctValue = correctValue;
         this.numGuesses = numGuesses;
     }
+
 }
