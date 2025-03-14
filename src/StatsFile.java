@@ -24,10 +24,10 @@ public class StatsFile extends GameStats {
     public StatsFile(){
         statsMap = new TreeMap<>();
         LocalDateTime limit = LocalDateTime.now().minusDays(30);
-        readCSV(FILENAME, limit);
+        readCSV(limit);
     }
 
-    public void readCSV(String fileName, LocalDateTime limit){
+    public void readCSV(LocalDateTime limit){
         try (CSVReader csvReader = new CSVReader(new FileReader(FILENAME))) {
             String[] values = null;
             while ((values = csvReader.readNext()) != null) {
@@ -61,6 +61,12 @@ public class StatsFile extends GameStats {
         }
     }
 
+    public void readLine(String[] csvLine, LocalDateTime limit, StatsFileDouble child){
+        this.statsMap = new TreeMap<>();
+        readLine(csvLine, limit);
+        child.setStatsMap(this.statsMap);
+    }
+
     @Override
     public int numGames(int numGuesses) {
         return statsMap.getOrDefault(numGuesses, 0);
@@ -70,4 +76,13 @@ public class StatsFile extends GameStats {
     public int maxNumGuesses(){
         return (statsMap.isEmpty() ? 0 : statsMap.lastKey());
     }
+
+    public int numGamesInBounds(int lowBound, int highBound){
+        int numGames = 0;
+        for(int i = lowBound; i <= highBound; i++){
+            numGames += numGames(i);
+        }
+        return numGames;
+    }
+
 }

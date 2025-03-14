@@ -15,4 +15,6 @@ public abstract class GameStats {
      * @return the maximum number of guesses that any game took
      */
     public abstract int maxNumGuesses();
+
+    public abstract int numGamesInBounds(int lowBound, int highBound);
 }
