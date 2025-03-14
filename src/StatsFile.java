@@ -1,6 +1,7 @@
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
 
+import javax.swing.*;
 import java.io.FileReader;
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -83,6 +84,16 @@ public class StatsFile extends GameStats {
             numGames += numGames(i);
         }
         return numGames;
+    }
+
+    public int[] constructBinEdgesArray(int[] edges){
+        int[] returnEdges = new int[edges.length];
+        for(int binIndex=0; binIndex < edges.length; binIndex++){
+            final int lowerBound = edges[binIndex];
+            int upperBound = binIndex == edges.length-1 ? this.maxNumGuesses() : edges[binIndex+1];
+            returnEdges[binIndex] = this.numGamesInBounds(lowerBound, upperBound);
+        }
+        return returnEdges;
     }
 
 }

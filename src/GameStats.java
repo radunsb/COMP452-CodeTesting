@@ -17,4 +17,6 @@ public abstract class GameStats {
     public abstract int maxNumGuesses();
 
     public abstract int numGamesInBounds(int lowBound, int highBound);
+
+    public abstract int[] constructBinEdgesArray(int[] edges);
 }

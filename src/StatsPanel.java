@@ -104,12 +104,10 @@ public class StatsPanel extends JPanel {
     private void updateResultsPanel(){
         clearResults();
         GameStats stats = new StatsFile();
-        for(int binIndex=0; binIndex<BIN_EDGES.length; binIndex++){
-            final int lowerBound = BIN_EDGES[binIndex];
-            int upperBound = binIndex == BIN_EDGES.length-1 ? stats.maxNumGuesses() : BIN_EDGES[binIndex+1];
-            int numGames = stats.numGamesInBounds(lowerBound, upperBound);
+        int[] numsInBounds = stats.constructBinEdgesArray(BIN_EDGES);
+        for(int binIndex=0; binIndex<numsInBounds.length; binIndex++){
             JLabel resultLabel = resultsLabels.get(binIndex);
-            resultLabel.setText(Integer.toString(numGames));
+            resultLabel.setText(Integer.toString(numsInBounds[binIndex]));
         }
     }
 }
