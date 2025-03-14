@@ -8,7 +8,7 @@ import java.util.function.Consumer;
  * Displays the computer's guesses and processes human's answers
  * Tracks the computer's guesses
  *
- * 
+ *
  */
 public class ComputerGuessesPanel extends JPanel {
 
@@ -21,6 +21,32 @@ public class ComputerGuessesPanel extends JPanel {
     private int lowerBound; // correct number is >= lowerBound
 
     private JLabel guessMessage;
+
+    public String getGuessMessage(){
+        return guessMessage.getText();
+    }
+
+    public void lesserSim(){
+        upperBound = Math.min(upperBound, lastGuess);
+        lastGuess = (lowerBound + upperBound + 1) / 2;
+        numGuesses += 1;
+        guessMessage.setText("I guess " + lastGuess + ".");
+    }
+
+    public void greaterSim(){
+        lowerBound = Math.max(lowerBound, lastGuess + 1);
+        lastGuess = (lowerBound + upperBound + 1) / 2;
+        numGuesses += 1;
+        guessMessage.setText("I guess " + lastGuess + ".");
+    }
+
+    public void equalSim(JPanel cardsPanel, Consumer<GameResult> gameFinishedCallback){
+        guessMessage.setText("I guess ___.");
+        GameResult result = new GameResult(false, lastGuess, numGuesses);
+        gameFinishedCallback.accept(result);
+        CardLayout cardLayout = (CardLayout) cardsPanel.getLayout();
+        cardLayout.show(cardsPanel, ScreenID.GAME_OVER.name());
+    }
 
     public void LessListener(){
         JButton lowerBtn = new JButton("Lower");
